@@ -1,3 +1,5 @@
+import Decimal from './node_modules/decimal.js/decimal.mjs';
+
 const unaryOperators = ['+/-', '%'];
 const binaryOperators = ['+', '-', '*', '/'];
 const screen = document.querySelector('.screen');
@@ -13,28 +15,31 @@ function unaryCalculate(a, operator) {
     if (operator == '+/-') {
         return -a;
     } else if (operator == '%') {
-        return a / 100;
+        return new Decimal(a).div(new Decimal(100));
     }
 }
 
 function binaryCalculate(a, operator, b) {
     if (operator == '+') {
-        return a + b;
+        return new Decimal(a).add(new Decimal(b));
     } else if (operator == '-') {
-        return a - b;
+        return new Decimal(a).sub(new Decimal(b));
     } else if (operator == '*') {
-        return a * b;
+        return new Decimal(a).mul(new Decimal(b));
     } else if (operator == '/') {
-        return b !== 0 ? a / b : NaN;
+        return b !== 0 ? new Decimal(a).div(new Decimal(b)) : NaN;
     }
 }
 
 function removeTrailingZero(numString) {
     let part = numString.split('.');
-    while (part[1].endsWith('0')) {
-        part[1] = part[1].substr(0, part[1].length - 1);
+    if (part[1]) {
+        while (part[1].endsWith('0') && part[1].length > 1) {
+            part[1] = part[1].substr(0, part[1].length - 1);
+        }
+        return part.join('.');
     }
-    return part[1] == '' ? part[0] : part[0] + '.' + part[1];
+    return part[0];
 }
 
 function showResult(num) {
@@ -224,4 +229,6 @@ document.querySelector('.calculator').addEventListener('click', event => {
         currentOperators.length = 0;
         readyToCalculate = 1;
     }
+    console.log(currentValue);
+    console.log(result);
 })

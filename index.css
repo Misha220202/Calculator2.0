@@ -6,9 +6,15 @@
 
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+footer {
+    margin: 5px;
+    font-size: 15px;
 }
 
 .calculator {
