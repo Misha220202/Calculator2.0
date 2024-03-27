@@ -29,8 +29,16 @@ function binaryCalculate(a, operator, b) {
     }
 }
 
-function showResult(x) {
-    const absoluteValue = x >= 0 ? x : -x;
+function removeTrailingZero(numString) {
+    let part = numString.split('.');
+    while (part[1].endsWith('0')) {
+        part[1] = part[1].substr(0, part[1].length - 1);
+    }
+    return part[1] == '' ? part[0] : part[0] + '.' + part[1];
+}
+
+function showResult(num) {
+    const absoluteValue = num >= 0 ? num : -num;
     const absoluteString = absoluteValue.toString();
     const position = absoluteString.indexOf('.');
     let numString = '';
@@ -39,16 +47,16 @@ function showResult(x) {
         numString = absoluteValue.toExponential();
         part = numString.split('e');
         if (part[0].length > 7) {
-            part[0] = Number(part[0]).toFixed(5);
+            part[0] = removeTrailingZero(Number(part[0]).toFixed(5));
             numString = part.join('e');
         }
     } else if (position >= 0 && absoluteString.length > 11) {
         part = absoluteString.split('.');
-        numString = Number(absoluteString).toFixed(10 - part[0].length);
+        numString = removeTrailingZero(Number(absoluteString).toFixed(10 - part[0].length));
     } else {
         numString = absoluteString;
     }
-    return x < 0 ? '-' + numString : numString;
+    return num < 0 ? '-' + numString : numString;
 }
 
 document.querySelector('.calculator').addEventListener('click', event => {
@@ -117,12 +125,6 @@ document.querySelector('.calculator').addEventListener('click', event => {
                 currentValue[0] = Number(currentDigits.join(''));
                 result = currentValue[0];
             }
-            currentOperators.push(value);
-            readyToCalculate = 0;
-            screen.textContent = showResult(result);
-            currentValue[0] = '';
-            currentValue.length = 1;
-            currentDigits.length = 0;
         } else if (!(currentValue[0] == '')) {//no input number before current operator. Use the unary calculated value as the currentValue
             if (binaryOperators.toSpliced(2, 4).includes(currentOperators[currentOperators.length - 1])) {//previous operator is '+' or '-'
                 result = binaryCalculate(result, currentOperators[currentOperators.length - 1], currentValue[currentValue.length - 1]);
@@ -139,15 +141,15 @@ document.querySelector('.calculator').addEventListener('click', event => {
             } else if (currentOperators.length == 0) {//no previous operator, currentValue is the first number to calculate
                 result = currentValue[0];
             }
-            currentOperators.push(value);
-            readyToCalculate = 0;
-            screen.textContent = showResult(result);
-            currentValue[0] = '';
-            currentValue.length = 1;
         } else if (currentOperators.length == 0) {//no previous operator or input number, use result or initial value to start
-            currentOperators.push(value);
-            readyToCalculate = 0;
+            ;
         }
+        currentOperators.push(value);
+        readyToCalculate = 0;
+        screen.textContent = showResult(result);
+        currentValue[0] = '';
+        currentValue.length = 1;
+        currentDigits.length = 0;
     } else if (binaryOperators.toSpliced(0, 2).includes(value) && readyToCalculate == 1) {//current input operator is '*' or '/'
         if (currentDigits.length > 0) {//use the input number as currentValue
             if (binaryOperators.toSpliced(2, 4).includes(currentOperators[currentOperators.length - 1]) || currentOperators.length == 0) {//previous operator is '+' or '-' / no previous operator, input number is the first number to calculate
@@ -156,24 +158,17 @@ document.querySelector('.calculator').addEventListener('click', event => {
                 currentValue.push(Number(currentDigits.join('')));
                 currentValue[currentValue.length - 1] = binaryCalculate(currentValue[currentValue.length - 2], currentOperators[currentOperators.length - 1], currentValue[currentValue.length - 1]);
             }
-            currentOperators.push(value);
-            readyToCalculate = 0;
-            screen.textContent = showResult(currentValue[currentValue.length - 1]);
-            currentDigits.length = 0;
         } else if (!(currentValue[0] == '')) {//no input number before current operator. Use the unary calculated value as the currentValue
             if (binaryOperators.toSpliced(0, 2).includes(currentOperators[currentOperators.length - 1])) {//previous operator is '*' or '/'
                 currentValue[currentValue.length - 1] = binaryCalculate(currentValue[currentValue.length - 2], currentOperators[currentOperators.length - 1], currentValue[currentValue.length - 1]);
             }
-            currentOperators.push(value);
-            readyToCalculate = 0;
-            screen.textContent = showResult(currentValue[currentValue.length - 1]);
         } else if (currentOperators.length == 0) {//no previous operator or input number, use result or initial value to start
-            if (currentValue[0] == '') {
-                currentValue[0] = result;
-            }
-            currentOperators.push(value);
-            readyToCalculate = 0;
+            currentValue[0] = result;
         }
+        currentOperators.push(value);
+        readyToCalculate = 0;
+        screen.textContent = showResult(currentValue[currentValue.length - 1]);
+        currentDigits.length = 0;
     } else if (value == '=') {
         if (readyToCalculate == 1) {
             if (currentDigits.length > 0) {//use the input number as currentValue
@@ -195,12 +190,6 @@ document.querySelector('.calculator').addEventListener('click', event => {
                     currentValue[0] = Number(currentDigits.join(''));
                     result = currentValue[0];
                 }
-                screen.textContent = showResult(result);
-                currentValue[0] = '';
-                currentValue.length = 1;
-                currentDigits.length = 0;
-                currentOperators.length = 0;
-                readyToCalculate = 1;
             } else if (!(currentValue[0] == '')) {//no input number before current operator. Use the '*' or '/' or unary calculated value as the currentValue
                 if (binaryOperators.toSpliced(2, 4).includes(currentOperators[currentOperators.length - 1])) {//previous operator is '+' or '-'
                     result = binaryCalculate(result, currentOperators[currentOperators.length - 1], currentValue[0]);
@@ -217,22 +206,22 @@ document.querySelector('.calculator').addEventListener('click', event => {
                 } else if (currentOperators.length == 0) {//no previous operator, input number is the first number to calculate
                     result = currentValue[0];
                 }
-                screen.textContent = showResult(result);
-                currentValue[0] = '';
-                currentValue.length = 1;
-                currentOperators.length = 0;
-                readyToCalculate = 1;
             }
-        } else {
-            if (binaryOperators.toSpliced(0, 2).includes(currentOperators.pop())) {
-                result += currentValue[currentValue.length - 1];
+        } else if (readyToCalculate == 0 && binaryOperators.toSpliced(0, 2).includes(currentOperators.pop())) {
+            while (binaryOperators.toSpliced(0, 2).includes(currentOperators[currentOperators.length - 1])) {
+                currentOperators.pop();
             }
-            screen.textContent = showResult(result);
-            currentValue[0] = '';
-            currentValue.length = 1;
-            currentDigits.length = 0;
-            currentOperators.length = 0;
-            readyToCalculate = 1;
+            if (currentOperators.length > 0) {
+                result = binaryCalculate(result, currentOperators[currentOperators.length - 1], currentValue[currentValue.length - 1]);
+            } else {
+                result = currentValue[currentValue.length - 1];
+            }
         }
+        screen.textContent = showResult(result);
+        currentValue[0] = '';
+        currentValue.length = 1;
+        currentDigits.length = 0;
+        currentOperators.length = 0;
+        readyToCalculate = 1;
     }
 })
