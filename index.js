@@ -1,5 +1,3 @@
-import Decimal from './node_modules/decimal.js/decimal.mjs';
-
 const unaryOperators = ['+/-', '%'];
 const binaryOperators = ['+', '-', '*', '/'];
 const screen = document.querySelector('.screen');
@@ -15,19 +13,19 @@ function unaryCalculate(a, operator) {
     if (operator == '+/-') {
         return -a;
     } else if (operator == '%') {
-        return new Decimal(a).div(new Decimal(100));
+        return a / 100;
     }
 }
 
 function binaryCalculate(a, operator, b) {
     if (operator == '+') {
-        return new Decimal(a).add(new Decimal(b));
+        return a + b;
     } else if (operator == '-') {
-        return new Decimal(a).sub(new Decimal(b));
+        return a - b;
     } else if (operator == '*') {
-        return new Decimal(a).mul(new Decimal(b));
+        return a * b;
     } else if (operator == '/') {
-        return b !== 0 ? new Decimal(a).div(new Decimal(b)) : NaN;
+        return b !== 0 ? a / b : NaN;
     }
 }
 
