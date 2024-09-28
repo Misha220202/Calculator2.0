@@ -5,8 +5,8 @@
 
 # Features
 * Unary Operations:
-** Negation (+/-): Changes the sign of the current number.
-** Percentage (%): Calculates the percentage of the current number.
+  * Negation (+/-): Changes the sign of the current number.
+  * Percentage (%): Calculates the percentage of the current number.
 * Binary Operations:
 ** Addition (+)
 ** Subtraction (-)
